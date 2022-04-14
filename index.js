@@ -1,372 +1,390 @@
-  // »ñÈ¡ÔªËØ
-  var canvas = document.getElementById('myCanvas');
-  canvas.ctx = canvas.getContext('2d');
-  var all = [],timer,heroX,backgroundFun,personFun,isOverFlag;
-  var windowHeight = window.innerHeight;
-  var windowWidth = window.innerWidth;
+// è·å–å…ƒç´ 
+var canvas = document.getElementById("myCanvas");
+canvas.ctx = canvas.getContext("2d");
+var all = [],
+	timer,
+	heroX,
+	backgroundFun,
+	personFun,
+	isOverFlag;
+var windowHeight = window.innerHeight;
+var windowWidth = window.innerWidth;
 
-  // ¼æÈİĞÔ´¦Àí
-	window.requestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame;
-	window.cancelAnimationFrame = window.cancelAnimationFrame || window.webkitCancelAnimationFrame;
-	var lastTime = 0;
-  window.requestAnimationFrame = function (callback) {
-    var currTime = new Date().getTime();
-    var timeToCall = Math.max(0, 16.7 - (currTime - lastTime));
-    var id = window.setTimeout(function () {
-      callback(currTime + timeToCall);
-    }, timeToCall);
-    lastTime = currTime + timeToCall;
-    return id;
-  };
-  window.cancelAnimationFrame = function (id) {
-    clearTimeout(id);
-  };
+// å…¼å®¹æ€§å¤„ç†
+window.requestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame;
+window.cancelAnimationFrame = window.cancelAnimationFrame || window.webkitCancelAnimationFrame;
+var lastTime = 0;
+window.requestAnimationFrame = function (callback) {
+	var currTime = new Date().getTime();
+	var timeToCall = Math.max(0, 16.7 - (currTime - lastTime));
+	var id = window.setTimeout(function () {
+		callback(currTime + timeToCall);
+	}, timeToCall);
+	lastTime = currTime + timeToCall;
+	return id;
+};
+window.cancelAnimationFrame = function (id) {
+	clearTimeout(id);
+};
 
-  // ÀûÓÃ CSS3 Ğı×ª ¶Ô¸ùÈİÆ÷ÄæÊ±ÕëĞı×ª 90 ¶È
-  var detectOrient = function () {
-    var width = document.documentElement.clientWidth,
-      height = document.documentElement.clientHeight,
-      $wrapper = document.getElementById("J_wrapper"),
-      style = "";
-    if (width >= height) { // ºáÆÁ
-      style += "width:" + width + "px;"; // ×¢ÒâĞı×ªºóµÄ¿í¸ßÇĞ»»
-      style += "height:" + height + "px;";
-      canvas.height = height;
-      canvas.width = width;
-    } else { // ÊúÆÁ
-      style += "width:" + height + "px;";
-      style += "height:" + width + "px;";
-      canvas.height = width;
-      canvas.width = height;
-    }
-    backgroundFun = new background();
-    backgroundFun.w = canvas.width;
-    backgroundFun.h = canvas.height;
-    $wrapper.style.cssText = style;
-  }
-  window.onresize = function(){
-    detectOrient();
-    if (document.querySelector('#page3').classList.contains('active')) {
-      init();
-    }
-  };
-  detectOrient();
+// åˆ©ç”¨ CSS3 æ—‹è½¬ å¯¹æ ¹å®¹å™¨é€†æ—¶é’ˆæ—‹è½¬ 90 åº¦
+var detectOrient = function () {
+	var width = document.documentElement.clientWidth,
+		height = document.documentElement.clientHeight,
+		$wrapper = document.getElementById("J_wrapper"),
+		style = "";
+	if (width >= height) {
+		// æ¨ªå±
+		style += "width:" + width + "px;"; // æ³¨æ„æ—‹è½¬åçš„å®½é«˜åˆ‡æ¢
+		style += "height:" + height + "px;";
+		canvas.height = height;
+		canvas.width = width;
+	} else {
+		// ç«–å±
+		style += "width:" + height + "px;";
+		style += "height:" + width + "px;";
+		canvas.height = width;
+		canvas.width = height;
+	}
+	backgroundFun = new background();
+	backgroundFun.w = canvas.width;
+	backgroundFun.h = canvas.height;
+	$wrapper.style.cssText = style;
+};
+window.onresize = function () {
+	detectOrient();
+	if (document.querySelector("#page3").classList.contains("active")) {
+		init();
+	}
+};
+detectOrient();
 
-  // ±³¾°
-  function background(){
-    this.x = 0; //³õÊ¼XÖáÎ»ÖÃ
-    this.y = 0; //³õÊ¼YÖáÎ»ÖÃ
-		this.w = canvas.width; //¿í¶È
-    this.h = canvas.height; //¸ß¶È
-		this.dx = 0; //Í¼Æ¬ÔÚÑ©±ÌÍ¼µÄXÖáÎ»ÖÃ
-		this.dy = 7546; //Í¼Æ¬ÔÚÑ©±ÌÍ¼µÄYÖáÎ»ÖÃ
-    this.mh = 7546; // ÏòÉÏÅÀĞĞ¸ß¶È
-    this.speed = 1; //ÔË¶¯»ù´¡ËÙ¶È
-  }
-  // Ğ¡ÈË
-  function person(){
-    this.x = canvas.width / 2 - 135 / 2;// Ğ¡ÈË³õÊ¼XÖáÎ»ÖÃ
-		this.y = canvas.height - 120;// Ğ¡ÈË³õÊ¼YÖáÎ»ÖÃ
-		this.dx = 0;
-		this.dy = 740;
-		this.w = 135;
-    this.h = 159;
-    this.blood = 100; //ÑªÁ¿
-    this.role = 'person';
-    this.state = 1;
-    this.stateNum = 0;
-  }
+// èƒŒæ™¯
+function background() {
+	this.x = 0; //åˆå§‹Xè½´ä½ç½®
+	this.y = 0; //åˆå§‹Yè½´ä½ç½®
+	this.w = canvas.width; //å®½åº¦
+	this.h = canvas.height; //é«˜åº¦
+	this.dx = 0; //å›¾ç‰‡åœ¨é›ªç¢§å›¾çš„Xè½´ä½ç½®
+	this.dy = 7546; //å›¾ç‰‡åœ¨é›ªç¢§å›¾çš„Yè½´ä½ç½®
+	this.mh = 7546; // å‘ä¸Šçˆ¬è¡Œé«˜åº¦
+	this.speed = 1; //è¿åŠ¨åŸºç¡€é€Ÿåº¦
+}
+// å°äºº
+function person() {
+	this.x = canvas.width / 2 - 135 / 2; // å°äººåˆå§‹Xè½´ä½ç½®
+	this.y = canvas.height - 120; // å°äººåˆå§‹Yè½´ä½ç½®
+	this.dx = 0;
+	this.dy = 740;
+	this.w = 135;
+	this.h = 159;
+	this.blood = 100; //è¡€é‡
+	this.role = "person";
+	this.state = 1;
+	this.stateNum = 0;
+}
 
-  // Ñ©Çò
-  function snowBall(){
-    this.x = parseInt(Math.random() * 460 + 50);
-		this.y = -41.5;
-		this.dx = 157;
-		this.dy = 0;
-		this.w = 81;
-    this.h = 83;
-    this.speed = 3;
-    this.effect = -15;
-    this.role = 'snowBall';
-  }
+// é›ªçƒ
+function snowBall() {
+	this.x = parseInt(Math.random() * 460 + 50);
+	this.y = -41.5;
+	this.dx = 157;
+	this.dy = 0;
+	this.w = 81;
+	this.h = 83;
+	this.speed = 3;
+	this.effect = -15;
+	this.role = "snowBall";
+}
 
-  // Ñ©¿é
-  function snowBlock(){
-    this.x = parseInt(Math.random() * 460 + 50);
-		this.y = -31.5;
-		this.dx = 70;
-		this.dy = 0;
-		this.w = 81;
-    this.h = 81;
-    this.speed = 1;
-    this.effect = -8;
-    this.role = 'snowBlock';
-  }
+// é›ªå—
+function snowBlock() {
+	this.x = parseInt(Math.random() * 460 + 50);
+	this.y = -31.5;
+	this.dx = 70;
+	this.dy = 0;
+	this.w = 81;
+	this.h = 81;
+	this.speed = 1;
+	this.effect = -8;
+	this.role = "snowBlock";
+}
 
-  // Ò©Æ¿
-  function bloodBottle(){
-    this.x = parseInt(Math.random() * 460 + 50);
-		this.y = -40.5;
-		this.dx = 0;
-		this.dy = 0;
-		this.w = 55;
-    this.h = 81;
-		this.effect= 10;
-    this.speed = 1;
-    this.role = 'bloodBottle';
-  }
+// è¯ç“¶
+function bloodBottle() {
+	this.x = parseInt(Math.random() * 460 + 50);
+	this.y = -40.5;
+	this.dx = 0;
+	this.dy = 0;
+	this.w = 55;
+	this.h = 81;
+	this.effect = 10;
+	this.speed = 1;
+	this.role = "bloodBottle";
+}
 
-  function init(){
-    all = [];
-		drawImages.timestamp = 0;
-    invasion.m = 0;
-    heroX = canvas.width / 2 - 88 / 2; //Ğ¡ÈË³õÊ¼Î»ÖÃµÄXÖá×ø±ê¸³Öµ
-    document.getElementById('audio').play();
-    personFun = new person();
-    all.push(backgroundFun);
-    all.push(personFun);
-    drawImages();
-  }
+function init() {
+	all = [];
+	drawImages.timestamp = 0;
+	invasion.m = 0;
+	heroX = canvas.width / 2 - 88 / 2; //å°äººåˆå§‹ä½ç½®çš„Xè½´åæ ‡èµ‹å€¼
+	document.getElementById("audio").play();
+	personFun = new person();
+	all.push(backgroundFun);
+	all.push(personFun);
+	drawImages();
+}
 
-  function drawImages(){
-		canvas.ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawImages.timestamp += 10;//Ë¢ĞÂµôÂäÎïÆ·µÄÊ±¼ä
-    if(all != ''){
-      invasion(drawImages.timestamp);
-      all.forEach(function(item){
-        setTimeout(function() {
-          if (item.y > windowHeight && all != '') all.remove(item);
-        }, 1000);
-        canvas.ctx.beginPath();
-        canvas.ctx.globalAlpha = 1;
-        var total = item.__proto__.constructor.name;
-        if(total == 'snowBall'){ // ÅĞ¶ÏÊÇ·ñÎªÑ©Çò
-          item.y += (1.5 * item.speed);
-        }else if(total == 'snowBlock'){ // ÅĞ¶ÏÊÇ·ñÎªÑ©Çò
-          item.y += item.speed;
-        }else if(total == 'bloodBottle'){//ÅĞ¶ÏÊÇ·ñÎªÑªÒ©
-          item.y += item.speed;
-        }else if(total == 'person'){// ÅĞ¶ÏÊÇ·ñÎªĞ¡ÈË
-          item.x = heroX;
-        }
-        if(total == 'background'){
-          item.dy -= item.speed;
-          // ¾àÀëÕ¹Ê¾
-          moveDistance(item);
-          function moveDistance(item){
-            document.querySelector('.moveNum').innerHTML = parseInt(item.mh-item.dy)+'m';
-            document.querySelector('#moveDistance').style.bottom = (item.mh-item.dy)/item.mh*147+ 10 +'px';//ÊµÊ±¼ÇÂ¼ÑªÁ¿±ä»¯
-          }
-          if(item.dy <= 0){
-            isOverFlag = true;
-            isOver(isOverFlag);
-          }
-          canvas.ctx.drawImage(raiden_bg,item.dx,item.dy,item.w,item.h,item.x,item.y,item.w,item.h);
-        }else if(total == 'person'){
-          item.stateNum+=0.1;
-          item.blood -= 0.03;
-          bloodVolume(item.blood);//ÊµÊ±¼ÇÂ¼ÑªÁ¿±ä»¯
-          if(item.blood <= 0){
-            isOverFlag = false;
-            isOver(isOverFlag);
-          }
-          switch (parseInt(item.state)) {
-            case 0: //Ïò×óÅÀ¶¯
-              personAnimate(item,265);
-              break;
-            case 1: //Î´ÒÆ¶¯
-              personAnimate(item,430);
-              break;
-            case 2: //ÏñÓÒÒÆ¶¯
-              personAnimate(item,100);
-              break;
-          }
-        }else{
-          canvas.ctx.drawImage(raiden_props,item.dx,item.dy,item.w,item.h,item.x,item.y,item.w/2,item.h/2);
-        }
-      })
-    }
-    try {
-			drawImages.timer = requestAnimationFrame(drawImages);
-    } catch (error) {}
-    all && all.forEach(function (item) {
-      drawImages.first = item;
-      all && all.forEach(function (other) {
-        drawImages.another = other;
-        drawImages.another !== drawImages.first && ishit(drawImages.first, drawImages.another);
-      });
-    });
-  }
-
-  // ³öÏÖ¹ÖÎïµÄÆµ´ÎÒÔ400ºÁÃëÎª»ù×¼£¬Öğ´Îµİ¼õ
-	function invasion(timestamp) {
-		invasion.speed = (400 - parseInt(timestamp / 400));
-    invasion.t = parseInt(timestamp / invasion.speed);
-		if (invasion.t > invasion.m) {
-      if(invasion.t % 4 == 0){
-        all.push(new snowBall());
-      }
-      if(invasion.t % 7 == 2){
-        all.push(new snowBlock());
-      }
-      if(invasion.t % 7 == 0){
-        all.push(new bloodBottle());
-      }
-      invasion.m = invasion.t;
-    }
-  };
-
-  /*
-	 *	Åö×²¼ì²â *
-	 */
-	function ishit(b,a) {
-		var h, v;
-		if (a.role !== b.role) {
-			// ÀñÎï»òÕßÕ¨µ¯ Åö×²¼ì²â
-			if ((a.role === 'snowBall' || a.role === 'snowBlock' || a.role === 'bloodBottle') && b.role === 'person') {
-				h = a.x > b.x ? Math.abs(a.x - b.x + a.w/2) : Math.abs(b.x - a.x + b.w/2);
-				v = a.y > b.y ? Math.abs(a.y - b.y + a.h/2) : Math.abs(b.y - a.y + b.h/2);
-				if (h <= (a.w/2 + b.w/2) && v <= (a.h/2 + b.h/2)) {
-          b.blood += premium(a);
-          if(b.blood >= 100) b.blood = 100; //³ÔÒ©´óÓÚ100ÏŞÖÆ×î´óÖµ
-          isOverFlag = false;
-          if (b.blood <= 0) isOver(isOverFlag); //ÓÎÏ·Ê§°Ü½áÊø
-          bloodVolume(b.blood);//ÊµÊ±¼ÇÂ¼ÑªÁ¿±ä»¯
+function drawImages() {
+	canvas.ctx.clearRect(0, 0, canvas.width, canvas.height);
+	drawImages.timestamp += 10; //åˆ·æ–°æ‰è½ç‰©å“çš„æ—¶é—´
+	if (all != "") {
+		invasion(drawImages.timestamp);
+		all.forEach(function (item) {
+			setTimeout(function () {
+				if (item.y > windowHeight && all != "") all.remove(item);
+			}, 1000);
+			canvas.ctx.beginPath();
+			canvas.ctx.globalAlpha = 1;
+			var total = item.__proto__.constructor.name;
+			if (total == "snowBall") {
+				// åˆ¤æ–­æ˜¯å¦ä¸ºé›ªçƒ
+				item.y += 1.5 * item.speed;
+			} else if (total == "snowBlock") {
+				// åˆ¤æ–­æ˜¯å¦ä¸ºé›ªçƒ
+				item.y += item.speed;
+			} else if (total == "bloodBottle") {
+				//åˆ¤æ–­æ˜¯å¦ä¸ºè¡€è¯
+				item.y += item.speed;
+			} else if (total == "person") {
+				// åˆ¤æ–­æ˜¯å¦ä¸ºå°äºº
+				item.x = heroX;
+			}
+			if (total == "background") {
+				item.dy -= item.speed;
+				// è·ç¦»å±•ç¤º
+				moveDistance(item);
+				function moveDistance(item) {
+					document.querySelector(".moveNum").innerHTML = parseInt(item.mh - item.dy) + "m";
+					document.querySelector("#moveDistance").style.bottom = ((item.mh - item.dy) / item.mh) * 147 + 10 + "px"; //å®æ—¶è®°å½•è¡€é‡å˜åŒ–
 				}
+				if (item.dy <= 0) {
+					isOverFlag = true;
+					isOver(isOverFlag);
+				}
+				canvas.ctx.drawImage(raiden_bg, item.dx, item.dy, item.w, item.h, item.x, item.y, item.w, item.h);
+			} else if (total == "person") {
+				item.stateNum += 0.1;
+				item.blood -= 0.03;
+				bloodVolume(item.blood); //å®æ—¶è®°å½•è¡€é‡å˜åŒ–
+				if (item.blood <= 0) {
+					isOverFlag = false;
+					isOver(isOverFlag);
+				}
+				switch (parseInt(item.state)) {
+					case 0: //å‘å·¦çˆ¬åŠ¨
+						personAnimate(item, 265);
+						break;
+					case 1: //æœªç§»åŠ¨
+						personAnimate(item, 430);
+						break;
+					case 2: //åƒå³ç§»åŠ¨
+						personAnimate(item, 100);
+						break;
+				}
+			} else {
+				canvas.ctx.drawImage(raiden_props, item.dx, item.dy, item.w, item.h, item.x, item.y, item.w / 2, item.h / 2);
+			}
+		});
+	}
+	try {
+		drawImages.timer = requestAnimationFrame(drawImages);
+	} catch (error) {}
+	all &&
+		all.forEach(function (item) {
+			drawImages.first = item;
+			all &&
+				all.forEach(function (other) {
+					drawImages.another = other;
+					drawImages.another !== drawImages.first && ishit(drawImages.first, drawImages.another);
+				});
+		});
+}
+
+// å‡ºç°æ€ªç‰©çš„é¢‘æ¬¡ä»¥400æ¯«ç§’ä¸ºåŸºå‡†ï¼Œé€æ¬¡é€’å‡
+function invasion(timestamp) {
+	invasion.speed = 400 - parseInt(timestamp / 400);
+	invasion.t = parseInt(timestamp / invasion.speed);
+	if (invasion.t > invasion.m) {
+		if (invasion.t % 4 == 0) {
+			all.push(new snowBall());
+		}
+		if (invasion.t % 7 == 2) {
+			all.push(new snowBlock());
+		}
+		if (invasion.t % 7 == 0) {
+			all.push(new bloodBottle());
+		}
+		invasion.m = invasion.t;
+	}
+}
+
+/*
+ *	ç¢°æ’æ£€æµ‹ *
+ */
+function ishit(b, a) {
+	var h, v;
+	if (a.role !== b.role) {
+		// ç¤¼ç‰©æˆ–è€…ç‚¸å¼¹ ç¢°æ’æ£€æµ‹
+		if ((a.role === "snowBall" || a.role === "snowBlock" || a.role === "bloodBottle") && b.role === "person") {
+			h = a.x > b.x ? Math.abs(a.x - b.x + a.w / 2) : Math.abs(b.x - a.x + b.w / 2);
+			v = a.y > b.y ? Math.abs(a.y - b.y + a.h / 2) : Math.abs(b.y - a.y + b.h / 2);
+			if (h <= a.w / 2 + b.w / 2 && v <= a.h / 2 + b.h / 2) {
+				b.blood += premium(a);
+				if (b.blood >= 100) b.blood = 100; //åƒè¯å¤§äº100é™åˆ¶æœ€å¤§å€¼
+				isOverFlag = false;
+				if (b.blood <= 0) isOver(isOverFlag); //æ¸¸æˆå¤±è´¥ç»“æŸ
+				bloodVolume(b.blood); //å®æ—¶è®°å½•è¡€é‡å˜åŒ–
 			}
 		}
-	};
-
-	// ¼¼ÄÜĞ§¹û¼°¼Ó·Ö
-	function premium(a) {
-    var number = 0;
-		explosion(a); //Åöµ½Õ¨µ¯±¬Õ¨
-    number = + a.effect;
-		return number;
-	};
-	// Åöµ½Õ¨µ¯±¬Õ¨
-	function explosion(o) {
-		if (o.role === 'snowBall' || o.role === 'snowBlock') {
-			var x = o.x - (213/2 - o.w/2) / 2;
-      var y = o.y - (178/2 - o.h/2) / 2;
-      canvas.ctx.drawImage(raiden_props, 0, 600, 213, 178, x, y, 213/2, 178/2);
-      decelerate();
-    }
-    all.remove(o);
 	}
+}
 
-  	// ÒÆ¶¯Ğ¡ÈË
-	var timeOutEventLeft,timeOutEventRight,timerLeft,timerRight;
-	left.addEventListener('touchstart',function(e){
-		timeOutEventLeft = setTimeout(longPressLeft,0);
-    clearInterval(timerRight);
-    personFun.state = 0;
-		e.preventDefault();
-	});
-	left.addEventListener('touchmove',function(e){
-		clearTimeout(timeOutEventLeft);
-		clearInterval(timerLeft);
-    timeOutEventLeft = 0;
-	});
-	left.addEventListener('touchend',function(e){
-		clearTimeout(timeOutEventLeft);
-    clearInterval(timerLeft);
-    personFun.state = 1;
-		return false;
-	});
-	function longPressLeft(){
-		timeOutEventLeft = 0;
-    //Ö´ĞĞ³¤°´ÊÂ¼şµÄĞĞÎª
-		clearInterval(timerLeft);
-		timerLeft = setInterval(function(){
-			if (heroX <= 50) {
-				heroX = 50;
-			}else{
-				heroX -=5;
-      }
-		}, 50);
-  }
+// æŠ€èƒ½æ•ˆæœåŠåŠ åˆ†
+function premium(a) {
+	var number = 0;
+	explosion(a); //ç¢°åˆ°ç‚¸å¼¹çˆ†ç‚¸
+	number = +a.effect;
+	return number;
+}
+// ç¢°åˆ°ç‚¸å¼¹çˆ†ç‚¸
+function explosion(o) {
+	if (o.role === "snowBall" || o.role === "snowBlock") {
+		var x = o.x - (213 / 2 - o.w / 2) / 2;
+		var y = o.y - (178 / 2 - o.h / 2) / 2;
+		canvas.ctx.drawImage(raiden_props, 0, 600, 213, 178, x, y, 213 / 2, 178 / 2);
+		decelerate();
+	}
+	all.remove(o);
+}
 
-	right.addEventListener('touchstart',function(e){
-		clearInterval(timerLeft);
-    timeOutEventRight = setTimeout(longPressRight,0);
-    personFun.state = 2;
-		e.preventDefault();
-	});
-	right.addEventListener('touchmove',function(e){
-		clearTimeout(timeOutEventRight);
-		clearInterval(timerRight);
-    timeOutEventRight = 0;
-	});
-	right.addEventListener('touchend',function(e){
-		clearTimeout(timeOutEventRight);
-    clearInterval(timerRight);
-    personFun.state = 1;
-		return false;
-	});
-	function longPressRight(){
-		//Ö´ĞĞ³¤°´ÊÂ¼şµÄĞĞÎª
-    timeOutEventRight = 0;
-		clearInterval(timerRight);
-		timerRight = setInterval(function(){
-			if (heroX >= canvas.width - 100) { //640-ÈËÎï¿í
-				heroX = canvas.width - 100;
-			}else{
-				heroX += 5;
+// ç§»åŠ¨å°äºº
+var timeOutEventLeft, timeOutEventRight, timerLeft, timerRight;
+left.addEventListener("touchstart", function (e) {
+	timeOutEventLeft = setTimeout(longPressLeft, 0);
+	clearInterval(timerRight);
+	personFun.state = 0;
+	e.preventDefault();
+});
+left.addEventListener("touchmove", function (e) {
+	clearTimeout(timeOutEventLeft);
+	clearInterval(timerLeft);
+	timeOutEventLeft = 0;
+});
+left.addEventListener("touchend", function (e) {
+	clearTimeout(timeOutEventLeft);
+	clearInterval(timerLeft);
+	personFun.state = 1;
+	return false;
+});
+function longPressLeft() {
+	timeOutEventLeft = 0;
+	//æ‰§è¡Œé•¿æŒ‰äº‹ä»¶çš„è¡Œä¸º
+	clearInterval(timerLeft);
+	timerLeft = setInterval(function () {
+		if (heroX <= 50) {
+			heroX = 50;
+		} else {
+			heroX -= 5;
+		}
+	}, 50);
+}
+
+right.addEventListener("touchstart", function (e) {
+	clearInterval(timerLeft);
+	timeOutEventRight = setTimeout(longPressRight, 0);
+	personFun.state = 2;
+	e.preventDefault();
+});
+right.addEventListener("touchmove", function (e) {
+	clearTimeout(timeOutEventRight);
+	clearInterval(timerRight);
+	timeOutEventRight = 0;
+});
+right.addEventListener("touchend", function (e) {
+	clearTimeout(timeOutEventRight);
+	clearInterval(timerRight);
+	personFun.state = 1;
+	return false;
+});
+function longPressRight() {
+	//æ‰§è¡Œé•¿æŒ‰äº‹ä»¶çš„è¡Œä¸º
+	timeOutEventRight = 0;
+	clearInterval(timerRight);
+	timerRight = setInterval(function () {
+		if (heroX >= canvas.width - 100) {
+			//640-äººç‰©å®½
+			heroX = canvas.width - 100;
+		} else {
+			heroX += 5;
+		}
+	}, 50);
+}
+function isOver(isOverFlag) {
+	cancelAnimationFrame && cancelAnimationFrame(drawImages.timer);
+	canvas.ctx.clearRect(0, 0, canvas.width, canvas.height);
+	if (isOverFlag) {
+		// æˆåŠŸç™»é¡¶
+		Carousel.showRule(document.querySelector("#page3"), document.querySelector("#page5"));
+	} else {
+		// ç™»é¡¶å¤±è´¥
+		Carousel.showRule(document.querySelector("#page3"), document.querySelector("#page4"));
+		all.forEach(function (item) {
+			var total = item.__proto__.constructor.name;
+			if (total == "background") {
+				// åˆ¤æ–­æ˜¯å¦ä¸ºé›ªçƒ
+				document.querySelector(".p4-t2").innerHTML = parseInt(item.mh - item.dy) + "m";
 			}
-		}, 50);
-  }
-  function isOver(isOverFlag) {
-    cancelAnimationFrame && cancelAnimationFrame(drawImages.timer);
-    canvas.ctx.clearRect(0, 0, canvas.width, canvas.height);
-    if(isOverFlag){ // ³É¹¦µÇ¶¥
-      Carousel.showRule(document.querySelector('#page3'),document.querySelector('#page5'));
-    }else{ // µÇ¶¥Ê§°Ü
-      Carousel.showRule(document.querySelector('#page3'),document.querySelector('#page4'));
-      all.forEach(function(item){
-        var total = item.__proto__.constructor.name;
-        if(total == 'background'){ // ÅĞ¶ÏÊÇ·ñÎªÑ©Çò
-          document.querySelector('.p4-t2').innerHTML = parseInt(item.mh - item.dy)+'m';
-        }
-      })
-    }
-    document.getElementById('audio').pause();
-    all = '';
-  };
+		});
+	}
+	document.getElementById("audio").pause();
+	all = "";
+}
 
-  // Ğ¡ÈË¶¯»­
-  function personAnimate(item,dy){
-    item.dx = parseInt(item.stateNum) % 6 * 135;
-    item.dy = dy;
-    canvas.ctx.drawImage(raiden_props,item.dx,item.dy,item.w,item.h,item.x,item.y,item.w/2,item.h/2);
-  }
-  // Åö×²¼õËÙ
-  function decelerate(){
-    all.forEach(function(item){
-      var total = item.__proto__.constructor.name;
-      if(total == 'bloodBottle' || total == 'snowBlock' || total == 'background'){
-        item.speed -= 0.5;
-        setTimeout(function(){
-          item.speed = 1;
-        }, 500);
-      }
-    })
-  }
-  // ÑªÁ¿Õ¹Ê¾
-  function bloodVolume(blood){
-    document.querySelector('#bloodVolume').style.height = blood/100*140 +'px';//ÊµÊ±¼ÇÂ¼ÑªÁ¿±ä»¯
-  }
-  // ¾àÀëÕ¹Ê¾
-  function moveDistance(y){
-    document.querySelector('#moveDistance').style.bottom = y/100*140 + 10+'px';//ÊµÊ±¼ÇÂ¼ÑªÁ¿±ä»¯
-  }
-  // »ñÈ¡Ğ¡ÈËµÄµ±Ç°ÒÆ¶¯×´Ì¬
-  function personStateGet(num){
-    var _num = num;
-    all.forEach(function(item){
-      var total = item.__proto__.constructor.name;
-      if(total == 'person'){ // ÅĞ¶ÏÊÇ·ñÎªÑ©Çò
-        item.state = _num;
-      }
-    })
-  }
+// å°äººåŠ¨ç”»
+function personAnimate(item, dy) {
+	item.dx = (parseInt(item.stateNum) % 6) * 135;
+	item.dy = dy;
+	canvas.ctx.drawImage(raiden_props, item.dx, item.dy, item.w, item.h, item.x, item.y, item.w / 2, item.h / 2);
+}
+// ç¢°æ’å‡é€Ÿ
+function decelerate() {
+	all.forEach(function (item) {
+		var total = item.__proto__.constructor.name;
+		if (total == "bloodBottle" || total == "snowBlock" || total == "background") {
+			item.speed -= 0.5;
+			setTimeout(function () {
+				item.speed = 1;
+			}, 500);
+		}
+	});
+}
+// è¡€é‡å±•ç¤º
+function bloodVolume(blood) {
+	document.querySelector("#bloodVolume").style.height = (blood / 100) * 140 + "px"; //å®æ—¶è®°å½•è¡€é‡å˜åŒ–
+}
+// è·ç¦»å±•ç¤º
+function moveDistance(y) {
+	document.querySelector("#moveDistance").style.bottom = (y / 100) * 140 + 10 + "px"; //å®æ—¶è®°å½•è¡€é‡å˜åŒ–
+}
+// è·å–å°äººçš„å½“å‰ç§»åŠ¨çŠ¶æ€
+function personStateGet(num) {
+	var _num = num;
+	all.forEach(function (item) {
+		var total = item.__proto__.constructor.name;
+		if (total == "person") {
+			// åˆ¤æ–­æ˜¯å¦ä¸ºé›ªçƒ
+			item.state = _num;
+		}
+	});
+}

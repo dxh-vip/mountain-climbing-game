@@ -46,7 +46,7 @@ var detectOrient = function () {
 		canvas.height = width;
 		canvas.width = height;
 	}
-	backgroundFun = new background();
+  backgroundFun = new background();
 	backgroundFun.w = canvas.width;
 	backgroundFun.h = canvas.height;
 	$wrapper.style.cssText = style;
@@ -129,7 +129,8 @@ function init() {
 	invasion.m = 0;
 	heroX = canvas.width / 2 - 88 / 2; //小人初始位置的X轴坐标赋值
 	document.getElementById("audio").play();
-	personFun = new person();
+  personFun = new person();
+  backgroundFun = new background();
 	all.push(backgroundFun);
 	all.push(personFun);
 	drawImages();
@@ -140,7 +141,7 @@ function drawImages() {
 	drawImages.timestamp += 10; //刷新掉落物品的时间
 	if (all != "") {
 		invasion(drawImages.timestamp);
-		all.forEach(function (item) {
+    all.forEach(function (item) {
 			setTimeout(function () {
 				if (item.y > windowHeight && all != "") all.remove(item);
 			}, 1000);
@@ -163,7 +164,7 @@ function drawImages() {
 			if (total == "background") {
 				item.dy -= item.speed;
 				// 距离展示
-				moveDistance(item);
+        moveDistance(item);
 				function moveDistance(item) {
 					document.querySelector(".moveNum").innerHTML = parseInt(item.mh - item.dy) + "m";
 					document.querySelector("#moveDistance").style.bottom = ((item.mh - item.dy) / item.mh) * 147 + 10 + "px"; //实时记录血量变化
@@ -271,18 +272,20 @@ function explosion(o) {
 // 移动小人
 var timeOutEventLeft, timeOutEventRight, timerLeft, timerRight;
 left.addEventListener("touchstart", function (e) {
-	timeOutEventLeft = setTimeout(longPressLeft, 0);
-	clearInterval(timerRight);
+	timeOutEventLeft = longPressLeft();
 	personFun.state = 0;
-	e.preventDefault();
+  e.preventDefault();
+  return false;
 });
 left.addEventListener("touchmove", function (e) {
-	clearTimeout(timeOutEventLeft);
-	clearInterval(timerLeft);
 	timeOutEventLeft = 0;
 });
 left.addEventListener("touchend", function (e) {
-	clearTimeout(timeOutEventLeft);
+	clearInterval(timerLeft);
+	personFun.state = 1;
+	return false;
+});
+left.addEventListener("touchcancel", function (e) {
 	clearInterval(timerLeft);
 	personFun.state = 1;
 	return false;
@@ -290,29 +293,30 @@ left.addEventListener("touchend", function (e) {
 function longPressLeft() {
 	timeOutEventLeft = 0;
 	//执行长按事件的行为
-	clearInterval(timerLeft);
+	// clearInterval(timerLeft);
 	timerLeft = setInterval(function () {
 		if (heroX <= 50) {
 			heroX = 50;
 		} else {
 			heroX -= 5;
 		}
-	}, 50);
+  }, 40);
 }
 
 right.addEventListener("touchstart", function (e) {
-	clearInterval(timerLeft);
-	timeOutEventRight = setTimeout(longPressRight, 0);
+	timeOutEventRight = longPressRight();
 	personFun.state = 2;
 	e.preventDefault();
 });
 right.addEventListener("touchmove", function (e) {
-	clearTimeout(timeOutEventRight);
-	clearInterval(timerRight);
 	timeOutEventRight = 0;
 });
 right.addEventListener("touchend", function (e) {
-	clearTimeout(timeOutEventRight);
+	clearInterval(timerRight);
+	personFun.state = 1;
+	return false;
+});
+right.addEventListener("touchcancel", function (e) {
 	clearInterval(timerRight);
 	personFun.state = 1;
 	return false;
@@ -327,7 +331,7 @@ function longPressRight() {
 			heroX = canvas.width - 100;
 		} else {
 			heroX += 5;
-		}
+    }
 	}, 50);
 }
 function isOver(isOverFlag) {

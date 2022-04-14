@@ -70,8 +70,9 @@ var Carousel = {
 		document.querySelectorAll(".again").forEach(function (item) {
 			item.addEventListener("tap", function () {
 				Carousel.showRule(document.querySelector("#page4"), document.querySelector("#page3"));
-				Carousel.showRule(document.querySelector("#page5"), document.querySelector("#page3"));
+        Carousel.showRule(document.querySelector("#page5"), document.querySelector("#page3"));
 				init();
+        
 			});
 		});
 

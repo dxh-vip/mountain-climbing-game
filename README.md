@@ -1,7 +1,7 @@
 # mountain-climbing-game
 A mountaineering game  
 
-Welcom to try !  
+Enjoy it !  
 
 https://htmlpreview.github.io/?https://github.com/dxh-vip/mountain-climbing-game/blob/main/index.html  
 

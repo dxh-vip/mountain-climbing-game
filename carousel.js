@@ -8,17 +8,6 @@ var Carousel = {
 		//初始化
 		Carousel.control();
 	},
-	videoSkip: function (stopBtn, video, box1, box2) {
-		stopBtn.addEventListener("tap", function () {
-			if (video) {
-				video.pause();
-			}
-			box1.style.display = "none";
-			box1.classList.remove("active");
-			box2.style.display = "block";
-			box2.classList.add("active");
-		});
-	},
 	showRule: function (ruleBox1, ruleBox2) {
 		ruleBox1.style.display = "none";
 		ruleBox2.style.display = "block";
